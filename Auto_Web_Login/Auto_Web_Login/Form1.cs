@@ -366,7 +366,8 @@ namespace Auto_Web_Login
 
                 try
                 {
-
+                    webBrowser1.Dispose();
+                    timerCurrentUrl.Dispose();
                     sendPasswordToTxtBThread.Abort();
                 }
                 catch (Exception)

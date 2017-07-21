@@ -30,11 +30,12 @@ namespace Auto_Web_Login
         public Form1()
         {
             InitializeComponent();
-
+            
         }
 
         private void btnNavigate_Click(object sender, EventArgs e)
         {
+           
             if(txtBURL.Text.StartsWith("http://") | txtBURL.Text.StartsWith("https://"))  //this is to make sure the user doesnt do stupid things ;)
             {
                 NavigateToURL();
@@ -46,8 +47,7 @@ namespace Auto_Web_Login
             {
                 webBrowser1.Navigate("https://www.google.com"); //redirect here incase of stupidity
             }
-          
-         
+           
         }
         //method to navigate to the url and parse out html contenet
         private void NavigateToURL()
@@ -83,12 +83,12 @@ namespace Auto_Web_Login
 
                 WebRequest request = WebRequest.Create(txtBURL.Text);
 
-            request.Credentials = CredentialCache.DefaultCredentials;
-             request.Timeout = 10000;
+                request.Credentials = CredentialCache.DefaultCredentials;
+                request.Timeout = 10000;
             
-            WebResponse response = request.GetResponse();
+                WebResponse response = request.GetResponse();
 
-            Stream data = response.GetResponseStream();
+                Stream data = response.GetResponseStream();
 
                 string html = string.Empty;
 
@@ -312,7 +312,10 @@ namespace Auto_Web_Login
             if(e.KeyChar == (char) ConsoleKey.Enter)
             {
 
-                btnNavigate_Click(null, null);
+               //btnNavigate_Click(null, null);
+                btnNavigate_Click(e.Handled = true,null); // stop the button beep sound
+               
+              
             }
         }
 
@@ -430,7 +433,10 @@ namespace Auto_Web_Login
         {
             try
             {
+                webBrowser1.Dispose();
+                timerCurrentUrl.Dispose();
                 sendPasswordToTxtBThread.Abort();
+                
 
             }
             catch (Exception)
@@ -442,6 +448,7 @@ namespace Auto_Web_Login
 
         private void btnGoBack_Click(object sender, EventArgs e)
         {
+           
             if (webBrowser1.CanGoBack)
             {
                 webBrowser1.GoBack();
@@ -476,16 +483,19 @@ namespace Auto_Web_Login
         private void Form1_Load(object sender, EventArgs e)
         {
             comBoxUpgradeBrowser.SelectedIndex = 2;
+            txtBURL.Focus();
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
+         
             webBrowser1.Refresh();
         }
 
         private void btnGoForward_Click(object sender, EventArgs e)
         {
-            if(webBrowser1.CanGoForward)
+           
+            if (webBrowser1.CanGoForward)
             {
                 webBrowser1.GoForward();
             }

@@ -13,16 +13,17 @@ namespace Auto_Web_Login
             //  if (string.IsNullOrEmpty(programName))
             //  {
             programName = AppDomain.CurrentDomain.FriendlyName;
-            RegistryKey regKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", true);
+            RegistryKey regKey = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", true);
 
 
             if (regKey != null)
             {
                 try
                 {
-                    regKey.SetValue(programName, browserVersion,
-                        RegistryValueKind.DWord);
+                    regKey.SetValue(programName, browserVersion, RegistryValueKind.DWord);
 
+                  
+                    regKey.Close();
                     MessageBox.Show("Success");
 
                 }
@@ -32,6 +33,7 @@ namespace Auto_Web_Login
                     MessageBox.Show("Error writing to the registry", ex.Message);
                 }
             }
+
             else
             {
                 try
@@ -41,9 +43,9 @@ namespace Auto_Web_Login
 
 
                     regKey.CreateSubKey("FEATURE_BROWSER_EMULATION");
-                    regKey.SetValue(programName, browserVersion,
-                        RegistryValueKind.DWord);
+                    regKey.SetValue(programName, browserVersion, RegistryValueKind.DWord);
 
+                    regKey.Close();
                     MessageBox.Show("Success");
                 }
                 catch (Exception ex)

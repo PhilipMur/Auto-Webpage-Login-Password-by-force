@@ -1,9 +1,11 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -25,15 +27,30 @@ namespace Auto_Web_Login
         private string currentUrl = "";
         private string urlChanged = "";
 
+        private string html = string.Empty;
+        private HtmlAgilityPack.HtmlDocument doc;
+
         Thread sendPasswordToTxtBThread;
+
+    
+        //place holders while running async gathering info then are used to update the GUI by Invoke
+        private List<string> listBoxErrorItems = new List<string>();
+        private List<string> tableItems1 = new List<string>();
+        private List<string> tableItems2 = new List<string>();
+        private List<string> tableItems3 = new List<string>();
+        private List<string> tableItems4 = new List<string>();
+        private List<string> tableItems5 = new List<string>();
+
+
+        private bool threadStarted = false;
 
         public Form1()
         {
             InitializeComponent();
             
         }
-
-        private void btnNavigate_Click(object sender, EventArgs e)
+        //this just navigates to the URL 
+        private  void btnNavigate_Click(object sender, EventArgs e)
         {
            
             if(txtBURL.Text.StartsWith("http://") | txtBURL.Text.StartsWith("https://"))  //this is to make sure the user doesnt do stupid things ;)
@@ -52,6 +69,15 @@ namespace Auto_Web_Login
         //method to navigate to the url and parse out html contenet
         private void NavigateToURL()
         {
+            listBoxErrorItems.Clear();
+            tableItems1.Clear();
+            tableItems2.Clear();
+            tableItems3.Clear();
+            tableItems4.Clear();
+            tableItems5.Clear();
+
+            listBoxErrors.Items.Clear();
+
             progressbarComplete = 0;
            // toolStripProgressBar1.Value = 0;
             toolStripStatusLabel1.Text = "Started";
@@ -59,21 +85,25 @@ namespace Auto_Web_Login
             btnNavigate.Enabled = false;
             txtBURL.Enabled = false;
 
-
-            webBrowser1.ScriptErrorsSuppressed = true;  //surpress any script errors
-            webBrowser1.Navigate(txtBURL.Text);   //navigate to url
             FillTable();
-             // await Task.Factory.StartNew(() => FillTable());   //load async incase of impatient people
+            //does anyone know how to not have the form lock up due to webrowser load on a shitty internet connection ??????????
+            webBrowser1.ScriptErrorsSuppressed = true;  //surpress any script errors
+            webBrowser1.Navigate(txtBURL.Text);   //navigate to url 
+          //  await Task.Run(() => webBrowser1.Navigate(txtBURL.Text)); //navigate to url async
+          
+          
         }
+       
+            
 
-
+           //this is the first part of the HTML async and then updates the GUI
         private async void FillTable()
         {
 
             //.AppendText("started at : " + DateTime.Now + "\n\r");
             try
             {
-              
+
                 //this rests the data grid view boxes cleans out the datasource
                 dataGridViewInputIds.DataSource = null;
                 dataGridViewButtonIds.DataSource = null;
@@ -81,26 +111,9 @@ namespace Auto_Web_Login
                 dataGridViewWebLinks.DataSource = null;
                 dataGridView1.DataSource = null;
 
-                WebRequest request = WebRequest.Create(txtBURL.Text);
+                
 
-                request.Credentials = CredentialCache.DefaultCredentials;
-                request.Timeout = 10000;
-            
-                WebResponse response = request.GetResponse();
 
-                Stream data = response.GetResponseStream();
-
-                string html = string.Empty;
-
-                using (StreamReader sr = new StreamReader(data))  
-                {
-                    // html = sr.ReadToEnd();
-                    html = await (sr.ReadToEndAsync()); //you can choose normal synchronous read but asynchronous is better
-                    sr.Close();
-                }
-
-                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-                doc.LoadHtml(html);
 
                 table = new DataTable("HTMLTableIDs");
                 table.Columns.Add("Input ID Found", typeof(string)).SetOrdinal(0);  // to put the column back to position 0 
@@ -127,20 +140,66 @@ namespace Auto_Web_Login
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 dataGridView1.ScrollBars = ScrollBars.Both;
 
+                WebRequest request = WebRequest.Create(txtBURL.Text);
+
+                request.Credentials = CredentialCache.DefaultCredentials;
+                request.Timeout = 10000;
+
+                WebResponse response = request.GetResponse();
+
+                Stream data = response.GetResponseStream();
+
+                html = string.Empty;
+
+
+
+                using (StreamReader sr = new StreamReader(data))
+                {
+                    // html = sr.ReadToEnd();
+                    html = await (sr.ReadToEndAsync()); //you can choose normal synchronous read but asynchronous is better every where lol
+                    if (sr.EndOfStream)
+                    {
+                        Invoke((MethodInvoker)async delegate
+                        {
+                            //await Task.Factory.StartNew(() => CarryOnFillTable());
+                           // await Task.Run(() => CarryOnFillTable());
+                            await Task.Factory.StartNew(() => CarryOnFillTable(),TaskCreationOptions.LongRunning);  //this one works best async as it handles better in the thread pool
+                        });
+                    }
+                    sr.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Fill Tables Failed");
+            }
+        }
+
+        //this is the second part of the HTML async and then updates the GUI
+        private void CarryOnFillTable()
+        { 
+       
+            try { 
+            
+                doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(html);
+
+             
                 //-------------------------------------------------
                 //this gets the inputs and id values from the html form
                 var inputid = doc.DocumentNode.SelectNodes("//input/@id");
                     if (inputid != null)
                         foreach (HtmlNode btnIDS in inputid)
                         {
-                            table.Rows.Add(btnIDS.GetAttributeValue("id", "inputDefault1"));
 
-
-                            dataGridViewInputIds.DataSource = table;
+                        tableItems1.Add(btnIDS.GetAttributeValue("id", "inputDefault1"));
+                        
                         }
                     else
                     {
-                    listBoxErrors.Items.Add("No Input IDs Available for this URL");
+
+                    listBoxErrorItems.Add("No Input IDs Available for this URL");
+                
                        // MessageBox.Show("No Input IDs Available for this URL", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 //-------------------------------------------------
@@ -149,14 +208,15 @@ namespace Auto_Web_Login
                     if (btnID != null)
                         foreach (HtmlNode btnid in btnID)
                         {
-                            table2.Rows.Add(btnid.GetAttributeValue("id", "inputDefault2"));
 
-
-                            dataGridViewButtonIds.DataSource = table2;
+                        tableItems2.Add(btnid.GetAttributeValue("id", "inputDefault2"));
+                      
                         }
                     else
                     {
-                    listBoxErrors.Items.Add("No Button IDs Available for this URL , Trying to find button as an input value instead !!");
+
+                    listBoxErrorItems.Add("No Button IDs Available for this URL , Trying to find button as an input value instead !!");
+                  
                     // MessageBox.Show("No Button IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 //-------------------------------------------------
@@ -165,14 +225,14 @@ namespace Auto_Web_Login
                     if (btnClass != null)
                         foreach (HtmlNode btn in btnClass)
                         {
-                            table2.Rows.Add(btn.GetAttributeValue("class", "buttonDefault"));
 
-
-                            dataGridViewButtonIds.DataSource = table2;
+                        tableItems2.Add(btn.GetAttributeValue("class", "buttonDefault"));
+                    
                         }
                     else
                     {
-                    listBoxErrors.Items.Add("No Button class IDs Available for this URL");
+                    listBoxErrorItems.Add("No Button class IDs Available for this URL");
+           
                     //  MessageBox.Show("No Button class IDs Available for this URL", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -182,14 +242,14 @@ namespace Auto_Web_Login
                     if(divs != null)
                         foreach(HtmlNode divss in divs)
                         {
-                            table3.Rows.Add(divss.GetAttributeValue("id", "submitDefault1"));
 
-
-                            dataGridViewOtherHtml.DataSource = table3;
+                        tableItems3.Add(divss.GetAttributeValue("id", "submitDefault1"));
+                      
                         }
                     else
                     {
-                    listBoxErrors.Items.Add("No Div with IDs Available for this URL");
+                    listBoxErrorItems.Add("No Div with IDs Available for this URL");
+                   
                     //  MessageBox.Show("No Div with IDs Available for this URL", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
               
@@ -199,14 +259,14 @@ namespace Auto_Web_Login
                         if (nameIDs != null)
                             foreach (HtmlNode btnname in nameIDs)
                             {
-                                table3.Rows.Add(btnname.GetAttributeValue("name", "submitDefault2"));
 
-
-                            dataGridViewOtherHtml.DataSource = table3;
+                        tableItems3.Add(btnname.GetAttributeValue("name", "submitDefault2"));
+                     
                             }
                         else
                         {
-                    listBoxErrors.Items.Add("No Input Name IDs Available for this URL ");
+                    listBoxErrorItems.Add("No Input Name IDs Available for this URL ");
+                 
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 //-------------------------------------------------
@@ -215,14 +275,13 @@ namespace Auto_Web_Login
                 if (tableClass != null)
                     foreach (HtmlNode btnname in tableClass)
                     {
-                        table3.Rows.Add(btnname.GetAttributeValue("class", "submitDefault3"));
-
-
-                        dataGridViewOtherHtml.DataSource = table3;
+                        tableItems3.Add(btnname.GetAttributeValue("class", "submitDefault3"));
+                     
                     }
                 else
                 {
-                    listBoxErrors.Items.Add("No table Class IDs Available for this URL ");
+                    listBoxErrorItems.Add("No table Class IDs Available for this URL ");
+                  
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -232,14 +291,13 @@ namespace Auto_Web_Login
                 if (nameIDclass != null)
                     foreach (HtmlNode btnname in nameIDclass)
                     {
-                        table3.Rows.Add(btnname.GetAttributeValue("class", "submitDefault3"));
-
-
-                        dataGridViewOtherHtml.DataSource = table3;
+                        tableItems3.Add(btnname.GetAttributeValue("class", "submitDefault3"));
+                  
                     }
                 else
                 {
-                    listBoxErrors.Items.Add("No input name Class IDs Available for this URL ");
+                    listBoxErrorItems.Add("No input name Class IDs Available for this URL ");
+                 
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 //-------------------------------------------------
@@ -248,14 +306,13 @@ namespace Auto_Web_Login
                 if (className != null)
                     foreach (HtmlNode btnname in className)
                     {
-                        table3.Rows.Add(btnname.GetAttributeValue("class", "submitDefault3"));
-
-
-                        dataGridViewOtherHtml.DataSource = table3;
+                        tableItems3.Add(btnname.GetAttributeValue("class", "submitDefault3"));
+                     
                     }
                 else
                 {
-                    listBoxErrors.Items.Add("No input Class IDs Available for this URL ");
+                    listBoxErrorItems.Add("No input Class IDs Available for this URL ");
+                 
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -265,14 +322,14 @@ namespace Auto_Web_Login
                 if (Weblinks != null)
                     foreach (HtmlNode webLink in Weblinks)
                     {
-                        table4.Rows.Add(webLink.GetAttributeValue("href", "WebLinkDefault"));
 
-
-                        dataGridViewWebLinks.DataSource = table4;
+                        tableItems4.Add(webLink.GetAttributeValue("href", "WebLinkDefault"));
+                     
                     }
                 else
                 {
-                    listBoxErrors.Items.Add("No Web Links Available for this URL ");
+                    listBoxErrorItems.Add("No Web Links Available for this URL ");
+                 
                     // MessageBox.Show("No Links Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 //-------------------------------------------------
@@ -281,14 +338,14 @@ namespace Auto_Web_Login
                 if (WebImages != null)
                     foreach (HtmlNode webLink in WebImages)
                     {
-                        table5.Rows.Add(webLink.GetAttributeValue("src", "ImageDefault"));
 
-
-                        dataGridView1.DataSource = table5;
+                        tableItems5.Add(webLink.GetAttributeValue("src", "ImageDefault"));
+                    
                     }
                 else
                 {
-                    listBoxErrors.Items.Add("No Image sources Available for this URL ");
+                    listBoxErrorItems.Add("No Image sources Available for this URL ");
+              
                     //  MessageBox.Show("No Links Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -298,10 +355,47 @@ namespace Auto_Web_Login
             }
             catch (Exception ex)
             {
-                listBoxErrors.Items.Add("Cannot scrape this site Bad Request, Original ERROR: " + ex.Message);
-                listBoxErrors.Items.Add("TRY RELOADING");
-                MessageBox.Show("Cannot scrape this site Bad Request , Original ERROR : " + ex.Message , "Something has gone wrong !! so fix it yourself lol");
+                listBoxErrorItems.Add("Cannot scrape this site Bad Request, Original ERROR: " + ex.Message);
+                listBoxErrorItems.Add("TRY RELOADING");
+             
+                MessageBox.Show("Cannot scrape this site Bad Request , TRY RELOADING it !!! , Original ERROR : " + ex.Message , "Something has gone wrong !! so fix it yourself lol", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            // invoke method to update the datagrids rows with HTML scraping and listbox with any errors
+            Invoke((MethodInvoker) delegate
+            {
+                foreach(string i in tableItems1)
+                {
+                    table.Rows.Add(i);
+
+                    dataGridViewInputIds.DataSource = table;
+                }
+                foreach (string i in tableItems2)
+                {
+                    table2.Rows.Add(i);
+
+                    dataGridViewButtonIds.DataSource = table2;
+                }
+                foreach (string i in tableItems3)
+                {
+                    table3.Rows.Add(i);
+
+                    dataGridViewOtherHtml.DataSource = table3;
+                }
+                foreach (string i in tableItems4)
+                {
+                    table4.Rows.Add(i);
+
+                    dataGridViewWebLinks.DataSource = table4;
+                }
+                foreach (string i in tableItems5)
+                {
+                    table5.Rows.Add(i);
+
+                    dataGridView1.DataSource = table5;
+                }
+
+                listBoxErrors.Items.AddRange(listBoxErrorItems.ToArray());
+            });
         }
     
 
@@ -312,7 +406,7 @@ namespace Auto_Web_Login
             if(e.KeyChar == (char) ConsoleKey.Enter)
             {
 
-               //btnNavigate_Click(null, null);
+               //btnNavigate_Click(null, null);  //this has the beep sound unless you like that sort of thing lol
                 btnNavigate_Click(e.Handled = true,null); // stop the button beep sound
                
               
@@ -340,6 +434,7 @@ namespace Auto_Web_Login
 
         private void btnStartSendFromFile_Click(object sender, EventArgs e)
         {
+            //start the timer that will send the password at the interval set
             timerCurrentUrl.Interval = (int)frequencySeconds.Value * 1000;
             timerCurrentUrl.Start();
             keepSending = true;
@@ -350,6 +445,8 @@ namespace Auto_Web_Login
 
             sendPasswordToTxtBThread = new Thread(new ThreadStart(SendThread));
             sendPasswordToTxtBThread.Start();
+
+            threadStarted = true;
         }
         private void timerCurrentUrl_Tick(object sender, EventArgs e)
         {
@@ -369,13 +466,12 @@ namespace Auto_Web_Login
 
                 try
                 {
-                    webBrowser1.Dispose();
-                    timerCurrentUrl.Dispose();
+
                     sendPasswordToTxtBThread.Abort();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-
+                    MessageBox.Show(ex.Message , "Auto Sending Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     // throw;
                 }
             }
@@ -393,11 +489,13 @@ namespace Auto_Web_Login
                 btnStopSendFromFile.Enabled = false;
                 btnStartSendFromFile.Enabled = true;
 
+                threadStarted = false;
+
                 sendPasswordToTxtBThread.Abort();
             }
-            catch
+            catch (Exception ex)
             {
-                
+                MessageBox.Show(ex.Message, "Stopping Thread Failed" ,MessageBoxButtons.OK,MessageBoxIcon.Error);
             }
         }
        
@@ -421,28 +519,42 @@ namespace Auto_Web_Login
                 submit.InvokeMember("click");
               
             }
-            catch (Exception)
+            catch (Exception )
             {
-
+                listBoxErrors.Items.Add("ERROR Could Not Send command to web page !!");
+               // MessageBox.Show(ex.Message, "m3");
                 //throw;
             }
 
         }
-
+        //dispose of resources while form is closing
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
             {
-                webBrowser1.Dispose();
-                timerCurrentUrl.Dispose();
-                sendPasswordToTxtBThread.Abort();
-                
+               
+                if (!webBrowser1.IsDisposed)
+                {
+                    webBrowser1.Dispose();
+                }
+              
+              if(timerCurrentUrl.Enabled)
+                {
+                    timerCurrentUrl.Dispose();
+                }
 
+
+            
+              if (threadStarted == true)
+                {
+                    sendPasswordToTxtBThread.Abort();
+                }
+                  
+  
             }
-            catch (Exception)
+            catch (Exception )
             {
-
-                // throw;
+              //do nothing i dont care just close so
             }
         }
 
@@ -490,6 +602,10 @@ namespace Auto_Web_Login
         {
          
             webBrowser1.Refresh();
+
+           // FillTable();
+
+          //  currentUrl = txtBURL.Text;
         }
 
         private void btnGoForward_Click(object sender, EventArgs e)
@@ -508,6 +624,7 @@ namespace Auto_Web_Login
             toolStripStatusLabel1.Text = "Complete";
             txtBURL.Text = webBrowser1.Url.AbsoluteUri; //update the txt url with the new url path if redirected
             urlChanged = webBrowser1.Url.AbsoluteUri;  //update the url changed so that it can compare to the reference url before it was running
+            toolStripProgressBar1.ProgressBar.Value = 100;
 
         }
         //this is to update the browser search and task complete method its not perfect but it works ok

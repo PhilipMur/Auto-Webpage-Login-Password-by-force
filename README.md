@@ -1,4 +1,4 @@
-# Auto-Webpage-Login-Password-by-force
+# Web Bot Auto-Webpage-Login-Password-by-force
 A simple C# GUI interface that will allow Automatic login to a web page and can brute force the passwords on most web pages.
 
 This is to be used as a personal pentest tool or for use as developer to test their own software against this sort of abuse.

@@ -3,7 +3,7 @@ A simple C# GUI interface that will allow Automatic login to a web page and can 
 
 This is to be used as a personal pentest tool or for use as developer to test their own software against this sort of abuse.
 
-Do not use this program for malicious intent as you will go to jail very quickly and most lickly fines etc...
+Do not use this program for malicious intent as you will go to jail very quickly and most likely fines etc...
 
 Remember be smart about what you do in Life.
 

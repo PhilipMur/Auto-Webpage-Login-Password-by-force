@@ -21,4 +21,4 @@ I use Visual Studio 2017 Community Edition or Visual Studio 2015 Express for Win
 
 How to ask questions?
 
-You can also use the Issues section on GitHub, i will assign a label to it, so it's different from bugs. I will try to respond within 24 hours! You can also contact me at My Youtube Channel Either a comment on the video about the topic, or a message at the Discussion section on my channel page
+You can also use the Issues section on GitHub, i will assign a label to it, so it's different from bugs. I will try to respond within 24 hours! You can also contact me at [My Youtube Channel](https://www.youtube.com/channel/UCAnWN8gy4oA1YbA9m8aVZ4Q) Either a comment on the video about the topic, or a message at the Discussion section on my channel page

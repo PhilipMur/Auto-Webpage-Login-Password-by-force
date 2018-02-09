@@ -7,7 +7,12 @@ A simple C# GUI interface that will allow Automatic login to a web page and can 
 
 ### Remember be smart about what you do in Life.
 
-# [USAGE See My Youtube Channel](https://www.youtube.com/watch?v=aGgSdXe8k9Q)
+# USAGE 
+
+## checkout my youtube channel [My Youtube Channel](https://www.youtube.com/watch?v=aGgSdXe8k9Q)
+
+## or
+
 Start by entering a valid URL.
 
 The web scraping will be carried out while the web page is loading and can be found in seperate tabs.
@@ -30,4 +35,6 @@ either upgrade or roll back your browser version.
 Any errors while loading will be placed in listbox section "List of Errors" for reference.
 
 Improvements are welcome aswell as collaboration.
+
+Philip M
 

@@ -7,6 +7,13 @@ A simple C# GUI interface that will allow Automatic login to a web page and can 
 
 ### Remember be smart about what you do in Life.
 
+
+
+# [Download Software](https://goo.gl/aMH2vK)
+Link to download the software [HERE](https://goo.gl/aMH2vK)
+
+
+
 # USAGE 
 
 ## checkout my youtube channel [My Youtube Channel](https://www.youtube.com/watch?v=aGgSdXe8k9Q)

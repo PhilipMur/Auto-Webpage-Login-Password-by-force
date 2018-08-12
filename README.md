@@ -1,13 +1,25 @@
-# Auto-Webpage-Login-Password-by-force
+# Web Bot Auto-Webpage-Login-Password-by-force
 A simple C# GUI interface that will allow Automatic login to a web page and can brute force the passwords on most web pages.
 
-This is to be used as a personal pentest tool or for use as developer to test their own software against this sort of abuse.
+### This is to be used as a personal pentest tool or for use as developer to test their own software against this sort of abuse.
 
-Do not use this program for malicious intent as you will go to jail very quickly and most likely fines etc...
+### Do not use this program for malicious intent as you will go to jail very quickly and most likely fines etc...
 
-Remember be smart about what you do in Life.
+### Remember be smart about what you do in Life.
 
-USAGE:
+
+
+# [Download Software](https://goo.gl/aMH2vK)
+Link to download the software [HERE](https://goo.gl/aMH2vK)
+
+
+
+# USAGE 
+
+## checkout my youtube channel [My Youtube Channel](https://www.youtube.com/watch?v=aGgSdXe8k9Q)
+
+## or
+
 Start by entering a valid URL.
 
 The web scraping will be carried out while the web page is loading and can be found in seperate tabs.
@@ -30,4 +42,6 @@ either upgrade or roll back your browser version.
 Any errors while loading will be placed in listbox section "List of Errors" for reference.
 
 Improvements are welcome aswell as collaboration.
+
+Philip M
 

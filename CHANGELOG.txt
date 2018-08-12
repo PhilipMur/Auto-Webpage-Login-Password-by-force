@@ -1,0 +1,10 @@
+ChangeLog 
+
+
+
+Added 12/08/2018
+-----------------------------------------------------------
+Now has the ability to use a proxy or while navigating or revert back to default with no proxy while navigating
+
+Changed by PhilipM
+-----------------------------------------------------------

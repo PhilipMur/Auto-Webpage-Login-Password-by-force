@@ -2,8 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,9 +33,14 @@ namespace Auto_Web_Login
         private string html = string.Empty;
         private HtmlAgilityPack.HtmlDocument doc;
 
+        private bool gowithProxy = false;
+        private bool goWithoutProxy = false;
+
         Thread sendPasswordToTxtBThread;
 
-    
+       
+
+
         //place holders while running async gathering info then are used to update the GUI by Invoke
         private List<string> listBoxErrorItems = new List<string>();
         private List<string> tableItems1 = new List<string>();
@@ -55,6 +63,9 @@ namespace Auto_Web_Login
            
             if(txtBURL.Text.StartsWith("http://") | txtBURL.Text.StartsWith("https://"))  //this is to make sure the user doesnt do stupid things ;)
             {
+                goWithoutProxy = true;
+                gowithProxy = false;
+
                 NavigateToURL();
 
                 currentUrl = txtBURL.Text;
@@ -62,13 +73,27 @@ namespace Auto_Web_Login
             }
             else
             {
-                webBrowser1.Navigate("https://www.google.com"); //redirect here incase of stupidity
+                webBrowser1.Navigate("http://www.bing.com"); //redirect here incase of stupidity
             }
            
         }
-        //method to navigate to the url and parse out html contenet
+        //method to navigate to the url and parse out html content
         private void NavigateToURL()
         {
+            //dont use a proxy
+            if(goWithoutProxy)
+            {
+                //reset the IE setting to default and remove proxy settings
+                WinInetInterop.RestoreSystemProxy();
+            }
+            //use the proxy
+            if (gowithProxy)
+            {
+               
+                WinInetInterop.SetConnectionProxy(txtBProxy.Text);
+            }
+           
+
             listBoxErrorItems.Clear();
             tableItems1.Clear();
             tableItems2.Clear();
@@ -88,10 +113,12 @@ namespace Auto_Web_Login
             FillTable();
             //does anyone know how to not have the form lock up due to webrowser load on a shitty internet connection ??????????
             webBrowser1.ScriptErrorsSuppressed = true;  //surpress any script errors
-            webBrowser1.Navigate(txtBURL.Text);   //navigate to url 
-          //  await Task.Run(() => webBrowser1.Navigate(txtBURL.Text)); //navigate to url async
-          
-          
+
+            webBrowser1.Navigate(txtBURL.Text);
+            /* webBrowser1.Navigate(txtBURL.Text, null,null,authHdr);*/   //navigate to url with credentials
+            //  await Task.Run(() => webBrowser1.Navigate(txtBURL.Text)); //navigate to url async
+
+
         }
        
             
@@ -501,22 +528,27 @@ namespace Auto_Web_Login
        
 
        // this is how you will send info to the webpage firstly to setup the automatic send web info
-        private void btnTest_Click(object sender, EventArgs e)
+        private  void btnTest_Click(object sender, EventArgs e)
         {
              System.Windows.Forms.HtmlDocument doc = webBrowser1.Document;
-          
+
             try
             {
                 HtmlElement username = doc.GetElementById(txtBUserElementID.Text);
                 HtmlElement password = doc.GetElementById(txtBPassElementID.Text);
                 HtmlElement submit = doc.GetElementById(txtBLoginElementID.Text);
 
-              
+                if (!checkBoxjustButtonClick.Checked)
+                {
 
-                username.SetAttribute("value", txtBUsername.Text);
-                password.SetAttribute("value", txtBPassword.Text);
+                    username.SetAttribute("value", txtBUsername.Text);
+                    password.SetAttribute("value", txtBPassword.Text);
 
+                }
+             
                 submit.InvokeMember("click");
+
+              
               
             }
             catch (Exception )
@@ -527,6 +559,7 @@ namespace Auto_Web_Login
             }
 
         }
+      
         //dispose of resources while form is closing
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -614,6 +647,29 @@ namespace Auto_Web_Login
             if (webBrowser1.CanGoForward)
             {
                 webBrowser1.GoForward();
+            }
+        }
+
+        private void btnGetFreeProxList_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://free-proxy-list.net/");
+        }
+
+        private void btnGoWithProxy_Click(object sender, EventArgs e)
+        {
+            if (txtBURL.Text.StartsWith("http://") | txtBURL.Text.StartsWith("https://"))  //this is to make sure the user doesnt do stupid things ;)
+            {
+                goWithoutProxy = false;
+                gowithProxy = true;
+
+                NavigateToURL();
+
+                currentUrl = txtBURL.Text;
+
+            }
+            else
+            {
+                webBrowser1.Navigate("http://www.bing.com"); //redirect here incase of stupidity
             }
         }
 

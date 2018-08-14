@@ -2,14 +2,14 @@ ChangeLog
 
 
 
-Added 12/08/2018
+Added 12/08/2018 version 1.0.0.2
 -----------------------------------------------------------
 Now has the ability to use a proxy or while navigating or revert back to default with no proxy while navigating
 
 Changed by PhilipM
 -----------------------------------------------------------
 
-Added 14/08/2018
+Added 14/08/2018 version 1.0.0.3
 -----------------------------------------------------------
 Faster load times for the webbrowser and HTML gathering.
 Intermittent freezing/locking issue solved.
@@ -21,3 +21,5 @@ Newest build of HtmlAgility packages used.
 
 Changed by PhilipM
 -----------------------------------------------------------
+
+

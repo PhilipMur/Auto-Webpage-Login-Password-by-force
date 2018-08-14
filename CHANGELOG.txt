@@ -8,3 +8,16 @@ Now has the ability to use a proxy or while navigating or revert back to default
 
 Changed by PhilipM
 -----------------------------------------------------------
+
+Added 14/08/2018
+-----------------------------------------------------------
+Faster load times for the webbrowser and HTML gathering.
+Intermittent freezing/locking issue solved.
+Ui redesign.
+Ability for a proxy or a proxy list to be used.
+Automatic change to a new proxy with a defined time.
+Timestamp added for errors.
+Newest build of HtmlAgility packages used.
+
+Changed by PhilipM
+-----------------------------------------------------------

@@ -1,7 +1,7 @@
 # Web Bot Auto-Webpage-Login-Password-by-force
 A simple C# GUI interface that will allow Automatic login to a web page and can brute force the passwords on most web pages.
 
-###New features added for use with Proxy and Proxy lists.
+### New features added for use with Proxy and Proxy lists.
 
 Note: http and or https proxys only !!! not socks5.
 

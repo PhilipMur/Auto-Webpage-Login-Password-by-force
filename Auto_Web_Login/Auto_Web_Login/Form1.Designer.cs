@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
@@ -44,6 +45,14 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabPage11 = new System.Windows.Forms.TabPage();
             this.listBoxErrors = new System.Windows.Forms.ListBox();
+            this.tabPage13 = new System.Windows.Forms.TabPage();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.ChangeTimeProxyMins = new System.Windows.Forms.NumericUpDown();
+            this.dataGridViewProxy = new System.Windows.Forms.DataGridView();
+            this.ProxyIP = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ProxyPort = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnGetFreeProxList = new System.Windows.Forms.Button();
             this.txtBUsername = new System.Windows.Forms.TextBox();
             this.btnNavigate = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -76,8 +85,6 @@
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.comBoxUpgradeBrowser = new System.Windows.Forms.ComboBox();
             this.btnUpgradeBrowser = new System.Windows.Forms.Button();
-            this.tabPage12 = new System.Windows.Forms.TabPage();
-            this.btnGetFreeProxList = new System.Windows.Forms.Button();
             this.timerCurrentUrl = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
@@ -85,11 +92,16 @@
             this.btnGoBack = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
             this.btnGoForward = new System.Windows.Forms.Button();
-            this.txtBProxy = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.checkBoxProxyAuto = new System.Windows.Forms.CheckBox();
             this.btnGoWithProxy = new System.Windows.Forms.Button();
-            this.label9 = new System.Windows.Forms.Label();
+            this.timerChangeProxy = new System.Windows.Forms.Timer(this.components);
+            this.backgroundWorkerHtml = new System.ComponentModel.BackgroundWorker();
+            this.txtBProxy = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.toolStripStatusLabelErrorCount = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -103,6 +115,9 @@
             this.tabPage10.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabPage11.SuspendLayout();
+            this.tabPage13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ChangeTimeProxyMins)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProxy)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl2.SuspendLayout();
@@ -111,7 +126,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.frequencySeconds)).BeginInit();
             this.tabPage5.SuspendLayout();
             this.tabPage6.SuspendLayout();
-            this.tabPage12.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -128,19 +142,21 @@
             this.tabControl1.Controls.Add(this.tabPage9);
             this.tabControl1.Controls.Add(this.tabPage10);
             this.tabControl1.Controls.Add(this.tabPage11);
-            this.tabControl1.Location = new System.Drawing.Point(7, 181);
+            this.tabControl1.Controls.Add(this.tabPage13);
+            this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabControl1.Location = new System.Drawing.Point(7, 179);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(861, 389);
+            this.tabControl1.Size = new System.Drawing.Size(876, 391);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.webBrowser1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(853, 363);
+            this.tabPage1.Size = new System.Drawing.Size(868, 362);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Web Browser";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -151,18 +167,19 @@
             this.webBrowser1.Location = new System.Drawing.Point(3, 3);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(847, 357);
+            this.webBrowser1.Size = new System.Drawing.Size(862, 356);
             this.webBrowser1.TabIndex = 0;
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
+            this.webBrowser1.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
             this.webBrowser1.ProgressChanged += new System.Windows.Forms.WebBrowserProgressChangedEventHandler(this.webBrowser1_ProgressChanged);
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.dataGridViewInputIds);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(853, 363);
+            this.tabPage2.Size = new System.Drawing.Size(868, 362);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "HTML Input IDs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -175,16 +192,16 @@
             this.dataGridViewInputIds.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewInputIds.Name = "dataGridViewInputIds";
             this.dataGridViewInputIds.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridViewInputIds.Size = new System.Drawing.Size(847, 357);
+            this.dataGridViewInputIds.Size = new System.Drawing.Size(862, 356);
             this.dataGridViewInputIds.TabIndex = 1;
             // 
             // tabPage7
             // 
             this.tabPage7.Controls.Add(this.dataGridViewButtonIds);
-            this.tabPage7.Location = new System.Drawing.Point(4, 22);
+            this.tabPage7.Location = new System.Drawing.Point(4, 25);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(853, 363);
+            this.tabPage7.Size = new System.Drawing.Size(868, 362);
             this.tabPage7.TabIndex = 2;
             this.tabPage7.Text = "HTML Button IDs";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -197,16 +214,16 @@
             this.dataGridViewButtonIds.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewButtonIds.Name = "dataGridViewButtonIds";
             this.dataGridViewButtonIds.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridViewButtonIds.Size = new System.Drawing.Size(847, 357);
+            this.dataGridViewButtonIds.Size = new System.Drawing.Size(862, 356);
             this.dataGridViewButtonIds.TabIndex = 2;
             // 
             // tabPage8
             // 
             this.tabPage8.Controls.Add(this.dataGridViewOtherHtml);
-            this.tabPage8.Location = new System.Drawing.Point(4, 22);
+            this.tabPage8.Location = new System.Drawing.Point(4, 25);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(853, 363);
+            this.tabPage8.Size = new System.Drawing.Size(868, 362);
             this.tabPage8.TabIndex = 3;
             this.tabPage8.Text = "Other HTML Inputs";
             this.tabPage8.UseVisualStyleBackColor = true;
@@ -219,16 +236,16 @@
             this.dataGridViewOtherHtml.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewOtherHtml.Name = "dataGridViewOtherHtml";
             this.dataGridViewOtherHtml.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridViewOtherHtml.Size = new System.Drawing.Size(847, 357);
+            this.dataGridViewOtherHtml.Size = new System.Drawing.Size(862, 356);
             this.dataGridViewOtherHtml.TabIndex = 3;
             // 
             // tabPage9
             // 
             this.tabPage9.Controls.Add(this.dataGridViewWebLinks);
-            this.tabPage9.Location = new System.Drawing.Point(4, 22);
+            this.tabPage9.Location = new System.Drawing.Point(4, 25);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(853, 363);
+            this.tabPage9.Size = new System.Drawing.Size(868, 362);
             this.tabPage9.TabIndex = 4;
             this.tabPage9.Text = "HTML Web Links";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -241,16 +258,16 @@
             this.dataGridViewWebLinks.Location = new System.Drawing.Point(3, 3);
             this.dataGridViewWebLinks.Name = "dataGridViewWebLinks";
             this.dataGridViewWebLinks.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridViewWebLinks.Size = new System.Drawing.Size(847, 357);
+            this.dataGridViewWebLinks.Size = new System.Drawing.Size(862, 356);
             this.dataGridViewWebLinks.TabIndex = 4;
             // 
             // tabPage10
             // 
             this.tabPage10.Controls.Add(this.dataGridView1);
-            this.tabPage10.Location = new System.Drawing.Point(4, 22);
+            this.tabPage10.Location = new System.Drawing.Point(4, 25);
             this.tabPage10.Name = "tabPage10";
             this.tabPage10.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage10.Size = new System.Drawing.Size(853, 363);
+            this.tabPage10.Size = new System.Drawing.Size(868, 362);
             this.tabPage10.TabIndex = 5;
             this.tabPage10.Text = "HTML Images";
             this.tabPage10.UseVisualStyleBackColor = true;
@@ -263,16 +280,16 @@
             this.dataGridView1.Location = new System.Drawing.Point(3, 3);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView1.Size = new System.Drawing.Size(847, 357);
+            this.dataGridView1.Size = new System.Drawing.Size(862, 356);
             this.dataGridView1.TabIndex = 5;
             // 
             // tabPage11
             // 
             this.tabPage11.Controls.Add(this.listBoxErrors);
-            this.tabPage11.Location = new System.Drawing.Point(4, 22);
+            this.tabPage11.Location = new System.Drawing.Point(4, 25);
             this.tabPage11.Name = "tabPage11";
             this.tabPage11.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage11.Size = new System.Drawing.Size(853, 363);
+            this.tabPage11.Size = new System.Drawing.Size(868, 362);
             this.tabPage11.TabIndex = 6;
             this.tabPage11.Text = "List of Errors";
             this.tabPage11.UseVisualStyleBackColor = true;
@@ -281,16 +298,116 @@
             // 
             this.listBoxErrors.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listBoxErrors.FormattingEnabled = true;
+            this.listBoxErrors.ItemHeight = 16;
             this.listBoxErrors.Location = new System.Drawing.Point(3, 3);
             this.listBoxErrors.Name = "listBoxErrors";
-            this.listBoxErrors.Size = new System.Drawing.Size(847, 357);
+            this.listBoxErrors.Size = new System.Drawing.Size(862, 356);
             this.listBoxErrors.TabIndex = 0;
+            // 
+            // tabPage13
+            // 
+            this.tabPage13.Controls.Add(this.label10);
+            this.tabPage13.Controls.Add(this.label9);
+            this.tabPage13.Controls.Add(this.ChangeTimeProxyMins);
+            this.tabPage13.Controls.Add(this.dataGridViewProxy);
+            this.tabPage13.Controls.Add(this.btnGetFreeProxList);
+            this.tabPage13.Location = new System.Drawing.Point(4, 25);
+            this.tabPage13.Name = "tabPage13";
+            this.tabPage13.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage13.Size = new System.Drawing.Size(868, 362);
+            this.tabPage13.TabIndex = 7;
+            this.tabPage13.Text = "Proxy List";
+            this.tabPage13.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(38, 28);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(170, 16);
+            this.label10.TabIndex = 19;
+            this.label10.Text = "Proxy Change Time (Mins): ";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(384, 180);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(463, 80);
+            this.label9.TabIndex = 7;
+            this.label9.Text = "NOTE: Free Proxy are normally slow and paid for Proxy are faster.\r\n\r\nHttp or Http" +
+    "s ONLY and NOT Socks5 proxys.\r\n\r\nMake sure the target is either http or https an" +
+    "d choose the proxy ability to suit.";
+            // 
+            // ChangeTimeProxyMins
+            // 
+            this.ChangeTimeProxyMins.Location = new System.Drawing.Point(215, 26);
+            this.ChangeTimeProxyMins.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.ChangeTimeProxyMins.Name = "ChangeTimeProxyMins";
+            this.ChangeTimeProxyMins.Size = new System.Drawing.Size(52, 22);
+            this.ChangeTimeProxyMins.TabIndex = 18;
+            this.ChangeTimeProxyMins.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // dataGridViewProxy
+            // 
+            this.dataGridViewProxy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.dataGridViewProxy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewProxy.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ProxyIP,
+            this.ProxyPort});
+            this.dataGridViewProxy.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.dataGridViewProxy.Location = new System.Drawing.Point(6, 59);
+            this.dataGridViewProxy.Name = "dataGridViewProxy";
+            this.dataGridViewProxy.RowHeadersVisible = false;
+            this.dataGridViewProxy.Size = new System.Drawing.Size(339, 297);
+            this.dataGridViewProxy.TabIndex = 0;
+            // 
+            // ProxyIP
+            // 
+            this.ProxyIP.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.ProxyIP.HeaderText = "Proxy I.P";
+            this.ProxyIP.Name = "ProxyIP";
+            // 
+            // ProxyPort
+            // 
+            this.ProxyPort.HeaderText = "ProxyPort";
+            this.ProxyPort.Name = "ProxyPort";
+            // 
+            // btnGetFreeProxList
+            // 
+            this.btnGetFreeProxList.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnGetFreeProxList.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnGetFreeProxList.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
+            this.btnGetFreeProxList.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnGetFreeProxList.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
+            this.btnGetFreeProxList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGetFreeProxList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGetFreeProxList.ForeColor = System.Drawing.Color.White;
+            this.btnGetFreeProxList.Location = new System.Drawing.Point(468, 70);
+            this.btnGetFreeProxList.Name = "btnGetFreeProxList";
+            this.btnGetFreeProxList.Size = new System.Drawing.Size(267, 34);
+            this.btnGetFreeProxList.TabIndex = 6;
+            this.btnGetFreeProxList.Text = "Get A Free Proxy List Online";
+            this.btnGetFreeProxList.UseVisualStyleBackColor = false;
+            this.btnGetFreeProxList.Click += new System.EventHandler(this.btnGetFreeProxList_Click);
             // 
             // txtBUsername
             // 
-            this.txtBUsername.Location = new System.Drawing.Point(89, 15);
+            this.txtBUsername.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBUsername.Location = new System.Drawing.Point(97, 19);
             this.txtBUsername.Name = "txtBUsername";
-            this.txtBUsername.Size = new System.Drawing.Size(183, 20);
+            this.txtBUsername.Size = new System.Drawing.Size(183, 22);
             this.txtBUsername.TabIndex = 1;
             this.txtBUsername.Text = "user";
             // 
@@ -298,12 +415,15 @@
             // 
             this.btnNavigate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnNavigate.BackColor = System.Drawing.Color.Yellow;
+            this.btnNavigate.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNavigate.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnNavigate.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnNavigate.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gold;
             this.btnNavigate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNavigate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnNavigate.Location = new System.Drawing.Point(653, 8);
+            this.btnNavigate.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnNavigate.Location = new System.Drawing.Point(643, 8);
             this.btnNavigate.Name = "btnNavigate";
-            this.btnNavigate.Size = new System.Drawing.Size(55, 23);
+            this.btnNavigate.Size = new System.Drawing.Size(70, 23);
             this.btnNavigate.TabIndex = 2;
             this.btnNavigate.Text = "Go";
             this.btnNavigate.UseVisualStyleBackColor = false;
@@ -312,26 +432,29 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 18);
+            this.label1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(6, 22);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(64, 13);
+            this.label1.Size = new System.Drawing.Size(75, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "Username : ";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 48);
+            this.label2.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(10, 52);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(62, 13);
+            this.label2.Size = new System.Drawing.Size(72, 15);
             this.label2.TabIndex = 5;
             this.label2.Text = "Password : ";
             // 
             // txtBPassword
             // 
-            this.txtBPassword.Location = new System.Drawing.Point(89, 41);
+            this.txtBPassword.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBPassword.Location = new System.Drawing.Point(97, 45);
             this.txtBPassword.Name = "txtBPassword";
-            this.txtBPassword.Size = new System.Drawing.Size(183, 20);
+            this.txtBPassword.Size = new System.Drawing.Size(183, 22);
             this.txtBPassword.TabIndex = 4;
             this.txtBPassword.Text = "pass";
             // 
@@ -339,10 +462,10 @@
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Yellow;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(9, 9);
+            this.label3.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(13, 11);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(50, 16);
+            this.label3.Size = new System.Drawing.Size(46, 16);
             this.label3.TabIndex = 7;
             this.label3.Text = "URL : ";
             // 
@@ -350,9 +473,12 @@
             // 
             this.txtBURL.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtBURL.BackColor = System.Drawing.Color.Black;
+            this.txtBURL.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBURL.ForeColor = System.Drawing.Color.White;
             this.txtBURL.Location = new System.Drawing.Point(65, 9);
             this.txtBURL.Name = "txtBURL";
-            this.txtBURL.Size = new System.Drawing.Size(574, 20);
+            this.txtBURL.Size = new System.Drawing.Size(572, 21);
             this.txtBURL.TabIndex = 6;
             this.txtBURL.Text = "http://bing.com/";
             this.txtBURL.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtBURL_KeyPress);
@@ -360,43 +486,52 @@
             // btnTest
             // 
             this.btnTest.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnTest.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTest.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnTest.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnTest.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Location = new System.Drawing.Point(278, 39);
+            this.btnTest.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTest.ForeColor = System.Drawing.Color.White;
+            this.btnTest.Location = new System.Drawing.Point(292, 43);
             this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
+            this.btnTest.Size = new System.Drawing.Size(134, 32);
             this.btnTest.TabIndex = 8;
-            this.btnTest.Text = "Test";
+            this.btnTest.Text = "Test the page";
             this.btnTest.UseVisualStyleBackColor = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // txtBPassElementID
             // 
-            this.txtBPassElementID.Location = new System.Drawing.Point(151, 52);
+            this.txtBPassElementID.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBPassElementID.Location = new System.Drawing.Point(140, 52);
             this.txtBPassElementID.Name = "txtBPassElementID";
-            this.txtBPassElementID.Size = new System.Drawing.Size(244, 20);
+            this.txtBPassElementID.Size = new System.Drawing.Size(255, 22);
             this.txtBPassElementID.TabIndex = 10;
             this.txtBPassElementID.Text = "password";
             // 
             // txtBUserElementID
             // 
-            this.txtBUserElementID.Location = new System.Drawing.Point(151, 23);
+            this.txtBUserElementID.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBUserElementID.Location = new System.Drawing.Point(140, 23);
             this.txtBUserElementID.Name = "txtBUserElementID";
-            this.txtBUserElementID.Size = new System.Drawing.Size(244, 20);
+            this.txtBUserElementID.Size = new System.Drawing.Size(255, 22);
             this.txtBUserElementID.TabIndex = 9;
             this.txtBUserElementID.Text = "username";
             // 
             // txtBLoginElementID
             // 
-            this.txtBLoginElementID.Location = new System.Drawing.Point(151, 81);
+            this.txtBLoginElementID.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBLoginElementID.Location = new System.Drawing.Point(140, 81);
             this.txtBLoginElementID.Name = "txtBLoginElementID";
-            this.txtBLoginElementID.Size = new System.Drawing.Size(244, 20);
+            this.txtBLoginElementID.Size = new System.Drawing.Size(255, 22);
             this.txtBLoginElementID.TabIndex = 11;
             this.txtBLoginElementID.Text = "btnlogin";
             // 
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.groupBox1.Controls.Add(this.label11);
             this.groupBox1.Controls.Add(this.checkBoxjustButtonClick);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label5);
@@ -404,6 +539,8 @@
             this.groupBox1.Controls.Add(this.txtBLoginElementID);
             this.groupBox1.Controls.Add(this.txtBUserElementID);
             this.groupBox1.Controls.Add(this.txtBPassElementID);
+            this.groupBox1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.groupBox1.Location = new System.Drawing.Point(16, 39);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(401, 132);
@@ -414,111 +551,125 @@
             // checkBoxjustButtonClick
             // 
             this.checkBoxjustButtonClick.AutoSize = true;
-            this.checkBoxjustButtonClick.Location = new System.Drawing.Point(22, 100);
+            this.checkBoxjustButtonClick.BackColor = System.Drawing.Color.DeepSkyBlue;
+            this.checkBoxjustButtonClick.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxjustButtonClick.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxjustButtonClick.Location = new System.Drawing.Point(140, 108);
             this.checkBoxjustButtonClick.Name = "checkBoxjustButtonClick";
-            this.checkBoxjustButtonClick.Size = new System.Drawing.Size(103, 17);
+            this.checkBoxjustButtonClick.Size = new System.Drawing.Size(113, 19);
             this.checkBoxjustButtonClick.TabIndex = 15;
             this.checkBoxjustButtonClick.Text = "Just button click";
-            this.checkBoxjustButtonClick.UseVisualStyleBackColor = true;
+            this.checkBoxjustButtonClick.UseVisualStyleBackColor = false;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(19, 84);
+            this.label6.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(1, 84);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(119, 13);
+            this.label6.Size = new System.Drawing.Size(133, 15);
             this.label6.TabIndex = 14;
             this.label6.Text = "Input ID Button Name : ";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(33, 55);
+            this.label5.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(19, 55);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(103, 13);
+            this.label5.Size = new System.Drawing.Size(117, 15);
             this.label5.TabIndex = 13;
             this.label5.Text = "Input ID Password : ";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(33, 26);
+            this.label4.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(15, 26);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(105, 13);
+            this.label4.Size = new System.Drawing.Size(120, 15);
             this.label4.TabIndex = 12;
             this.label4.Text = "Input ID Username : ";
             // 
             // groupBox2
             // 
-            this.groupBox2.BackColor = System.Drawing.Color.DarkOrange;
+            this.groupBox2.BackColor = System.Drawing.Color.Orange;
             this.groupBox2.Controls.Add(this.btnUrlReference);
             this.groupBox2.Controls.Add(this.txtBUsername);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.btnTest);
             this.groupBox2.Controls.Add(this.txtBPassword);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Location = new System.Drawing.Point(39, 5);
+            this.groupBox2.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox2.Location = new System.Drawing.Point(6, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(361, 73);
+            this.groupBox2.Size = new System.Drawing.Size(441, 78);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Username && Password Login";
             // 
             // btnUrlReference
             // 
-            this.btnUrlReference.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnUrlReference.BackColor = System.Drawing.Color.Aqua;
+            this.btnUrlReference.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnUrlReference.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnUrlReference.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnUrlReference.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnUrlReference.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUrlReference.Location = new System.Drawing.Point(278, 10);
+            this.btnUrlReference.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUrlReference.Location = new System.Drawing.Point(292, 8);
             this.btnUrlReference.Name = "btnUrlReference";
-            this.btnUrlReference.Size = new System.Drawing.Size(75, 23);
+            this.btnUrlReference.Size = new System.Drawing.Size(134, 29);
             this.btnUrlReference.TabIndex = 9;
-            this.btnUrlReference.Text = "Url Refer";
+            this.btnUrlReference.Text = "Set Url Reference";
             this.btnUrlReference.UseVisualStyleBackColor = false;
             this.btnUrlReference.Click += new System.EventHandler(this.btnUrlReference_Click);
             // 
             // btnSendFilePath
             // 
             this.btnSendFilePath.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnSendFilePath.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSendFilePath.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnSendFilePath.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnSendFilePath.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnSendFilePath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSendFilePath.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSendFilePath.ForeColor = System.Drawing.Color.White;
             this.btnSendFilePath.Location = new System.Drawing.Point(3, 15);
             this.btnSendFilePath.Name = "btnSendFilePath";
             this.btnSendFilePath.Size = new System.Drawing.Size(113, 23);
             this.btnSendFilePath.TabIndex = 11;
-            this.btnSendFilePath.Text = "Passwords File Path";
+            this.btnSendFilePath.Text = "Passwords File";
             this.btnSendFilePath.UseVisualStyleBackColor = false;
             this.btnSendFilePath.Click += new System.EventHandler(this.btnSendFromFile_Click);
             // 
             // tabControl2
             // 
-            this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl2.Controls.Add(this.tabPage3);
             this.tabControl2.Controls.Add(this.tabPage4);
             this.tabControl2.Controls.Add(this.tabPage5);
             this.tabControl2.Controls.Add(this.tabPage6);
-            this.tabControl2.Controls.Add(this.tabPage12);
+            this.tabControl2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl2.Location = new System.Drawing.Point(423, 64);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(449, 109);
+            this.tabControl2.Size = new System.Drawing.Size(460, 109);
             this.tabControl2.TabIndex = 14;
             // 
             // tabPage3
             // 
+            this.tabPage3.BackColor = System.Drawing.Color.Black;
             this.tabPage3.Controls.Add(this.groupBox2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(441, 83);
+            this.tabPage3.Size = new System.Drawing.Size(452, 83);
             this.tabPage3.TabIndex = 0;
-            this.tabPage3.Text = "Test";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabPage3.Text = "Test the Page";
             // 
             // tabPage4
             // 
-            this.tabPage4.BackColor = System.Drawing.Color.LightGray;
+            this.tabPage4.BackColor = System.Drawing.Color.Black;
             this.tabPage4.Controls.Add(this.lblFilePath);
             this.tabPage4.Controls.Add(this.label7);
             this.tabPage4.Controls.Add(this.frequencySeconds);
@@ -528,31 +679,36 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(441, 83);
+            this.tabPage4.Size = new System.Drawing.Size(452, 83);
             this.tabPage4.TabIndex = 1;
             this.tabPage4.Text = "Send Password from file";
             // 
             // lblFilePath
             // 
             this.lblFilePath.AutoSize = true;
+            this.lblFilePath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFilePath.ForeColor = System.Drawing.Color.White;
             this.lblFilePath.Location = new System.Drawing.Point(122, 20);
             this.lblFilePath.Name = "lblFilePath";
-            this.lblFilePath.Size = new System.Drawing.Size(22, 13);
+            this.lblFilePath.Size = new System.Drawing.Size(26, 13);
             this.lblFilePath.TabIndex = 15;
             this.lblFilePath.Text = "? : ";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(11, 48);
+            this.label7.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.ForeColor = System.Drawing.Color.White;
+            this.label7.Location = new System.Drawing.Point(7, 47);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(96, 13);
+            this.label7.Size = new System.Drawing.Size(112, 15);
             this.label7.TabIndex = 15;
             this.label7.Text = "Frequency (Secs): ";
             // 
             // frequencySeconds
             // 
-            this.frequencySeconds.Location = new System.Drawing.Point(113, 45);
+            this.frequencySeconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.frequencySeconds.Location = new System.Drawing.Point(125, 46);
             this.frequencySeconds.Name = "frequencySeconds";
             this.frequencySeconds.Size = new System.Drawing.Size(52, 20);
             this.frequencySeconds.TabIndex = 14;
@@ -565,12 +721,17 @@
             // btnStopSendFromFile
             // 
             this.btnStopSendFromFile.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnStopSendFromFile.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnStopSendFromFile.Enabled = false;
+            this.btnStopSendFromFile.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnStopSendFromFile.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnStopSendFromFile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnStopSendFromFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnStopSendFromFile.Location = new System.Drawing.Point(171, 43);
+            this.btnStopSendFromFile.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStopSendFromFile.ForeColor = System.Drawing.Color.White;
+            this.btnStopSendFromFile.Location = new System.Drawing.Point(196, 43);
             this.btnStopSendFromFile.Name = "btnStopSendFromFile";
-            this.btnStopSendFromFile.Size = new System.Drawing.Size(89, 23);
+            this.btnStopSendFromFile.Size = new System.Drawing.Size(112, 34);
             this.btnStopSendFromFile.TabIndex = 13;
             this.btnStopSendFromFile.Text = "Stop Sending";
             this.btnStopSendFromFile.UseVisualStyleBackColor = false;
@@ -579,12 +740,17 @@
             // btnStartSendFromFile
             // 
             this.btnStartSendFromFile.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnStartSendFromFile.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnStartSendFromFile.Enabled = false;
+            this.btnStartSendFromFile.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnStartSendFromFile.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnStartSendFromFile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnStartSendFromFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnStartSendFromFile.Location = new System.Drawing.Point(266, 43);
+            this.btnStartSendFromFile.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStartSendFromFile.ForeColor = System.Drawing.Color.White;
+            this.btnStartSendFromFile.Location = new System.Drawing.Point(324, 43);
             this.btnStartSendFromFile.Name = "btnStartSendFromFile";
-            this.btnStartSendFromFile.Size = new System.Drawing.Size(89, 23);
+            this.btnStartSendFromFile.Size = new System.Drawing.Size(98, 34);
             this.btnStartSendFromFile.TabIndex = 12;
             this.btnStartSendFromFile.Text = "Start Sending";
             this.btnStartSendFromFile.UseVisualStyleBackColor = false;
@@ -592,83 +758,70 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.BackColor = System.Drawing.Color.Black;
             this.tabPage5.Controls.Add(this.listBoxFoundPass);
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(441, 83);
+            this.tabPage5.Size = new System.Drawing.Size(452, 83);
             this.tabPage5.TabIndex = 2;
             this.tabPage5.Text = "Found Passwords";
-            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // listBoxFoundPass
             // 
             this.listBoxFoundPass.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxFoundPass.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxFoundPass.FormattingEnabled = true;
-            this.listBoxFoundPass.Location = new System.Drawing.Point(7, 7);
+            this.listBoxFoundPass.ItemHeight = 15;
+            this.listBoxFoundPass.Location = new System.Drawing.Point(6, 2);
             this.listBoxFoundPass.Name = "listBoxFoundPass";
-            this.listBoxFoundPass.Size = new System.Drawing.Size(425, 69);
+            this.listBoxFoundPass.Size = new System.Drawing.Size(440, 79);
             this.listBoxFoundPass.TabIndex = 0;
             // 
             // tabPage6
             // 
+            this.tabPage6.BackColor = System.Drawing.Color.Black;
             this.tabPage6.Controls.Add(this.comBoxUpgradeBrowser);
             this.tabPage6.Controls.Add(this.btnUpgradeBrowser);
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(441, 83);
+            this.tabPage6.Size = new System.Drawing.Size(452, 83);
             this.tabPage6.TabIndex = 3;
             this.tabPage6.Text = "Upgrade Browser";
-            this.tabPage6.UseVisualStyleBackColor = true;
             // 
             // comBoxUpgradeBrowser
             // 
+            this.comBoxUpgradeBrowser.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.comBoxUpgradeBrowser.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comBoxUpgradeBrowser.FormattingEnabled = true;
             this.comBoxUpgradeBrowser.Items.AddRange(new object[] {
             "ver 9",
             "ver 10",
             "ver 11"});
-            this.comBoxUpgradeBrowser.Location = new System.Drawing.Point(125, 21);
+            this.comBoxUpgradeBrowser.Location = new System.Drawing.Point(198, 31);
             this.comBoxUpgradeBrowser.Name = "comBoxUpgradeBrowser";
-            this.comBoxUpgradeBrowser.Size = new System.Drawing.Size(121, 21);
+            this.comBoxUpgradeBrowser.Size = new System.Drawing.Size(121, 23);
             this.comBoxUpgradeBrowser.TabIndex = 1;
             // 
             // btnUpgradeBrowser
             // 
             this.btnUpgradeBrowser.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnUpgradeBrowser.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnUpgradeBrowser.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnUpgradeBrowser.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnUpgradeBrowser.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnUpgradeBrowser.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUpgradeBrowser.Location = new System.Drawing.Point(21, 21);
+            this.btnUpgradeBrowser.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUpgradeBrowser.ForeColor = System.Drawing.Color.White;
+            this.btnUpgradeBrowser.Location = new System.Drawing.Point(75, 29);
             this.btnUpgradeBrowser.Name = "btnUpgradeBrowser";
-            this.btnUpgradeBrowser.Size = new System.Drawing.Size(75, 23);
+            this.btnUpgradeBrowser.Size = new System.Drawing.Size(98, 26);
             this.btnUpgradeBrowser.TabIndex = 0;
             this.btnUpgradeBrowser.Text = "Upgrade";
             this.btnUpgradeBrowser.UseVisualStyleBackColor = false;
             this.btnUpgradeBrowser.Click += new System.EventHandler(this.btnUpgradeBrowser_Click);
-            // 
-            // tabPage12
-            // 
-            this.tabPage12.Controls.Add(this.label9);
-            this.tabPage12.Controls.Add(this.btnGetFreeProxList);
-            this.tabPage12.Location = new System.Drawing.Point(4, 22);
-            this.tabPage12.Name = "tabPage12";
-            this.tabPage12.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage12.Size = new System.Drawing.Size(441, 83);
-            this.tabPage12.TabIndex = 4;
-            this.tabPage12.Text = "Get Proxy LIst";
-            this.tabPage12.UseVisualStyleBackColor = true;
-            // 
-            // btnGetFreeProxList
-            // 
-            this.btnGetFreeProxList.Location = new System.Drawing.Point(96, 8);
-            this.btnGetFreeProxList.Name = "btnGetFreeProxList";
-            this.btnGetFreeProxList.Size = new System.Drawing.Size(267, 34);
-            this.btnGetFreeProxList.TabIndex = 6;
-            this.btnGetFreeProxList.Text = "Get A Free Proxy List Online";
-            this.btnGetFreeProxList.UseVisualStyleBackColor = true;
-            this.btnGetFreeProxList.Click += new System.EventHandler(this.btnGetFreeProxList_Click);
             // 
             // timerCurrentUrl
             // 
@@ -678,10 +831,12 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar1,
-            this.toolStripStatusLabel1});
+            this.toolStripStatusLabel1,
+            this.toolStripStatusLabel2,
+            this.toolStripStatusLabelErrorCount});
             this.statusStrip1.Location = new System.Drawing.Point(0, 575);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(871, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(886, 22);
             this.statusStrip1.TabIndex = 15;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -692,6 +847,7 @@
             // 
             // toolStripStatusLabel1
             // 
+            this.toolStripStatusLabel1.BackColor = System.Drawing.Color.Cyan;
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
             this.toolStripStatusLabel1.Text = "Status";
@@ -700,10 +856,14 @@
             // 
             this.btnGoBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGoBack.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnGoBack.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnGoBack.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnGoBack.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnGoBack.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnGoBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGoBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGoBack.Location = new System.Drawing.Point(714, 8);
+            this.btnGoBack.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGoBack.ForeColor = System.Drawing.Color.White;
+            this.btnGoBack.Location = new System.Drawing.Point(719, 8);
             this.btnGoBack.Name = "btnGoBack";
             this.btnGoBack.Size = new System.Drawing.Size(35, 23);
             this.btnGoBack.TabIndex = 16;
@@ -715,12 +875,16 @@
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRefresh.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRefresh.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnRefresh.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRefresh.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRefresh.Location = new System.Drawing.Point(796, 8);
+            this.btnRefresh.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRefresh.ForeColor = System.Drawing.Color.White;
+            this.btnRefresh.Location = new System.Drawing.Point(801, 8);
             this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(66, 31);
+            this.btnRefresh.Size = new System.Drawing.Size(78, 23);
             this.btnRefresh.TabIndex = 17;
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.UseVisualStyleBackColor = false;
@@ -730,10 +894,14 @@
             // 
             this.btnGoForward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGoForward.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnGoForward.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnGoForward.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnGoForward.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnGoForward.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DeepSkyBlue;
             this.btnGoForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGoForward.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGoForward.Location = new System.Drawing.Point(755, 8);
+            this.btnGoForward.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGoForward.ForeColor = System.Drawing.Color.White;
+            this.btnGoForward.Location = new System.Drawing.Point(760, 8);
             this.btnGoForward.Name = "btnGoForward";
             this.btnGoForward.Size = new System.Drawing.Size(35, 23);
             this.btnGoForward.TabIndex = 18;
@@ -741,30 +909,23 @@
             this.btnGoForward.UseVisualStyleBackColor = false;
             this.btnGoForward.Click += new System.EventHandler(this.btnGoForward_Click);
             // 
-            // txtBProxy
-            // 
-            this.txtBProxy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBProxy.Location = new System.Drawing.Point(492, 39);
-            this.txtBProxy.Name = "txtBProxy";
-            this.txtBProxy.Size = new System.Drawing.Size(147, 20);
-            this.txtBProxy.TabIndex = 6;
-            this.txtBProxy.Text = "5.9.247.239:53281";
-            this.txtBProxy.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtBURL_KeyPress);
-            // 
             // label8
             // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label8.AutoSize = true;
             this.label8.BackColor = System.Drawing.Color.Yellow;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(427, 41);
+            this.label8.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(430, 40);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(59, 16);
+            this.label8.Size = new System.Drawing.Size(57, 16);
             this.label8.TabIndex = 7;
             this.label8.Text = "Proxy : ";
             // 
             // panel1
             // 
+            this.panel1.BackColor = System.Drawing.Color.Black;
+            this.panel1.Controls.Add(this.txtBProxy);
+            this.panel1.Controls.Add(this.checkBoxProxyAuto);
             this.panel1.Controls.Add(this.btnGoWithProxy);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.btnGoForward);
@@ -774,49 +935,102 @@
             this.panel1.Controls.Add(this.btnRefresh);
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.txtBURL);
-            this.panel1.Controls.Add(this.txtBProxy);
             this.panel1.Controls.Add(this.btnGoBack);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(871, 175);
+            this.panel1.Size = new System.Drawing.Size(886, 175);
             this.panel1.TabIndex = 19;
+            // 
+            // checkBoxProxyAuto
+            // 
+            this.checkBoxProxyAuto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkBoxProxyAuto.AutoSize = true;
+            this.checkBoxProxyAuto.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.checkBoxProxyAuto.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxProxyAuto.ForeColor = System.Drawing.Color.White;
+            this.checkBoxProxyAuto.Location = new System.Drawing.Point(751, 43);
+            this.checkBoxProxyAuto.Name = "checkBoxProxyAuto";
+            this.checkBoxProxyAuto.Size = new System.Drawing.Size(134, 19);
+            this.checkBoxProxyAuto.TabIndex = 20;
+            this.checkBoxProxyAuto.Text = "Auto Change Proxy";
+            this.checkBoxProxyAuto.UseVisualStyleBackColor = true;
+            this.checkBoxProxyAuto.CheckedChanged += new System.EventHandler(this.checkBoxProxyAuto_CheckedChanged);
             // 
             // btnGoWithProxy
             // 
             this.btnGoWithProxy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGoWithProxy.BackColor = System.Drawing.Color.Yellow;
+            this.btnGoWithProxy.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnGoWithProxy.FlatAppearance.BorderColor = System.Drawing.Color.Blue;
             this.btnGoWithProxy.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Lime;
+            this.btnGoWithProxy.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gold;
             this.btnGoWithProxy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGoWithProxy.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGoWithProxy.Location = new System.Drawing.Point(653, 34);
+            this.btnGoWithProxy.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGoWithProxy.Location = new System.Drawing.Point(643, 37);
             this.btnGoWithProxy.Name = "btnGoWithProxy";
-            this.btnGoWithProxy.Size = new System.Drawing.Size(137, 23);
+            this.btnGoWithProxy.Size = new System.Drawing.Size(103, 23);
             this.btnGoWithProxy.TabIndex = 19;
             this.btnGoWithProxy.Text = "Go With Proxy";
             this.btnGoWithProxy.UseVisualStyleBackColor = false;
             this.btnGoWithProxy.Click += new System.EventHandler(this.btnGoWithProxy_Click);
             // 
-            // label9
+            // timerChangeProxy
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(76, 54);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(311, 13);
-            this.label9.TabIndex = 7;
-            this.label9.Text = "NOTE: Free Proxy are normally slow and paid for Proxy are faster";
+            this.timerChangeProxy.Tick += new System.EventHandler(this.timerChangeProxy_Tick);
+            // 
+            // backgroundWorkerHtml
+            // 
+            this.backgroundWorkerHtml.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerHtml_DoWork);
+            // 
+            // txtBProxy
+            // 
+            this.txtBProxy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtBProxy.BackColor = System.Drawing.Color.Black;
+            this.txtBProxy.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtBProxy.ForeColor = System.Drawing.Color.White;
+            this.txtBProxy.Location = new System.Drawing.Point(493, 38);
+            this.txtBProxy.Name = "txtBProxy";
+            this.txtBProxy.Size = new System.Drawing.Size(144, 21);
+            this.txtBProxy.TabIndex = 21;
+            this.txtBProxy.Text = "51.38.71.101:8080";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(7, 109);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(127, 15);
+            this.label11.TabIndex = 16;
+            this.label11.Text = "Test the page option : ";
+            // 
+            // toolStripStatusLabelErrorCount
+            // 
+            this.toolStripStatusLabelErrorCount.BackColor = System.Drawing.Color.Red;
+            this.toolStripStatusLabelErrorCount.Name = "toolStripStatusLabelErrorCount";
+            this.toolStripStatusLabelErrorCount.Size = new System.Drawing.Size(133, 17);
+            this.toolStripStatusLabelErrorCount.Text = "List of Errors Counter : 0";
+            // 
+            // toolStripStatusLabel2
+            // 
+            this.toolStripStatusLabel2.BackColor = System.Drawing.SystemColors.Control;
+            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(52, 17);
+            this.toolStripStatusLabel2.Text = "       |       ";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(871, 597);
+            this.BackColor = System.Drawing.Color.Black;
+            this.ClientSize = new System.Drawing.Size(886, 597);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.tabControl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(902, 636);
             this.Name = "Form1";
-            this.ShowIcon = false;
             this.Text = "Auto Web Login";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -833,6 +1047,10 @@
             this.tabPage10.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tabPage11.ResumeLayout(false);
+            this.tabPage13.ResumeLayout(false);
+            this.tabPage13.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ChangeTimeProxyMins)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewProxy)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -844,8 +1062,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.frequencySeconds)).EndInit();
             this.tabPage5.ResumeLayout(false);
             this.tabPage6.ResumeLayout(false);
-            this.tabPage12.ResumeLayout(false);
-            this.tabPage12.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -911,13 +1127,24 @@
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.Button btnGoForward;
         private System.Windows.Forms.CheckBox checkBoxjustButtonClick;
-        private System.Windows.Forms.TabPage tabPage12;
         private System.Windows.Forms.Button btnGetFreeProxList;
-        private System.Windows.Forms.TextBox txtBProxy;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnGoWithProxy;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TabPage tabPage13;
+        private System.Windows.Forms.DataGridView dataGridViewProxy;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ProxyIP;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ProxyPort;
+        private System.Windows.Forms.CheckBox checkBoxProxyAuto;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.NumericUpDown ChangeTimeProxyMins;
+        private System.Windows.Forms.Timer timerChangeProxy;
+        private System.ComponentModel.BackgroundWorker backgroundWorkerHtml;
+        private System.Windows.Forms.TextBox txtBProxy;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelErrorCount;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
     }
 }
 

@@ -4,16 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
 /// <summary>
-/// Created By Philip M 2017 under MIT License for everyone to use, share and collaborate to make it better.
+/// Created By Philip M 2017 - 2018 under MIT License for everyone to use, share and collaborate to make it better.
 ///
 /// </summary>
 namespace Auto_Web_Login
@@ -42,12 +39,18 @@ namespace Auto_Web_Login
 
 
         //place holders while running async gathering info then are used to update the GUI by Invoke
-        private List<string> listBoxErrorItems = new List<string>();
+        private List<string> listBoxErrorItemsList = new List<string>();
         private List<string> tableItems1 = new List<string>();
         private List<string> tableItems2 = new List<string>();
         private List<string> tableItems3 = new List<string>();
         private List<string> tableItems4 = new List<string>();
         private List<string> tableItems5 = new List<string>();
+
+        //holds the current key value of the dictionary
+        int currProxyValue = 0;
+
+        //holds the proxy list
+        Dictionary<int, string> proxyDictionary = new Dictionary<int, string>();
 
 
         private bool threadStarted = false;
@@ -68,7 +71,7 @@ namespace Auto_Web_Login
 
                 NavigateToURL();
 
-                currentUrl = txtBURL.Text;
+                currentUrl = "";
 
             }
             else
@@ -94,7 +97,7 @@ namespace Auto_Web_Login
             }
            
 
-            listBoxErrorItems.Clear();
+            listBoxErrorItemsList.Clear();
             tableItems1.Clear();
             tableItems2.Clear();
             tableItems3.Clear();
@@ -110,7 +113,7 @@ namespace Auto_Web_Login
             btnNavigate.Enabled = false;
             txtBURL.Enabled = false;
 
-            FillTable();
+            
             //does anyone know how to not have the form lock up due to webrowser load on a shitty internet connection ??????????
             webBrowser1.ScriptErrorsSuppressed = true;  //surpress any script errors
 
@@ -124,10 +127,10 @@ namespace Auto_Web_Login
             
 
            //this is the first part of the HTML async and then updates the GUI
-        private async void FillTable()
+        private  void FillTable()
         {
 
-            //.AppendText("started at : " + DateTime.Now + "\n\r");
+           
             try
             {
 
@@ -167,38 +170,25 @@ namespace Auto_Web_Login
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 dataGridView1.ScrollBars = ScrollBars.Both;
 
-                WebRequest request = WebRequest.Create(txtBURL.Text);
 
-                request.Credentials = CredentialCache.DefaultCredentials;
-                request.Timeout = 10000;
+               // CarryOnFillTable();
 
-                WebResponse response = request.GetResponse();
+                ////I dont need to make 2 web requests i will just use the document completed event from the webbrowser and get the document text
 
-                Stream data = response.GetResponseStream();
-
-                html = string.Empty;
-
-
-
-                using (StreamReader sr = new StreamReader(data))
-                {
-                    // html = sr.ReadToEnd();
-                    html = await (sr.ReadToEndAsync()); //you can choose normal synchronous read but asynchronous is better every where lol
-                    if (sr.EndOfStream)
-                    {
-                        Invoke((MethodInvoker)async delegate
+                Invoke((MethodInvoker)async delegate
                         {
-                            //await Task.Factory.StartNew(() => CarryOnFillTable());
-                           // await Task.Run(() => CarryOnFillTable());
-                            await Task.Factory.StartNew(() => CarryOnFillTable(),TaskCreationOptions.LongRunning);  //this one works best async as it handles better in the thread pool
+                           
+                            await Task.Factory.StartNew(() => CarryOnFillTable(), TaskCreationOptions.LongRunning);  //this one works best async as it handles better in the thread pool
                         });
-                    }
-                    sr.Close();
-                }
+
+
+             
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Fill Tables Failed");
+               // MessageBox.Show(ex.Message, "Fill Tables Failed");
+
+                listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + ex.Message + "  == Fill Tables Failed");
             }
         }
 
@@ -209,9 +199,10 @@ namespace Auto_Web_Login
             try { 
             
                 doc = new HtmlAgilityPack.HtmlDocument();
-                doc.LoadHtml(html);
+               // doc.LoadHtml(html); //documentWebBrow
+                doc.LoadHtml(documentWebBrow);
 
-             
+
                 //-------------------------------------------------
                 //this gets the inputs and id values from the html form
                 var inputid = doc.DocumentNode.SelectNodes("//input/@id");
@@ -225,7 +216,7 @@ namespace Auto_Web_Login
                     else
                     {
 
-                    listBoxErrorItems.Add("No Input IDs Available for this URL");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Input IDs Available for this URL");
                 
                        // MessageBox.Show("No Input IDs Available for this URL", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -242,7 +233,7 @@ namespace Auto_Web_Login
                     else
                     {
 
-                    listBoxErrorItems.Add("No Button IDs Available for this URL , Trying to find button as an input value instead !!");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Button IDs Available for this URL , Trying to find button as an input value instead !!");
                   
                     // MessageBox.Show("No Button IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -258,7 +249,7 @@ namespace Auto_Web_Login
                         }
                     else
                     {
-                    listBoxErrorItems.Add("No Button class IDs Available for this URL");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Button class IDs Available for this URL");
            
                     //  MessageBox.Show("No Button class IDs Available for this URL", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -275,7 +266,7 @@ namespace Auto_Web_Login
                         }
                     else
                     {
-                    listBoxErrorItems.Add("No Div with IDs Available for this URL");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Div with IDs Available for this URL");
                    
                     //  MessageBox.Show("No Div with IDs Available for this URL", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -292,7 +283,7 @@ namespace Auto_Web_Login
                             }
                         else
                         {
-                    listBoxErrorItems.Add("No Input Name IDs Available for this URL ");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Input Name IDs Available for this URL ");
                  
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -307,7 +298,7 @@ namespace Auto_Web_Login
                     }
                 else
                 {
-                    listBoxErrorItems.Add("No table Class IDs Available for this URL ");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No table Class IDs Available for this URL ");
                   
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -323,7 +314,7 @@ namespace Auto_Web_Login
                     }
                 else
                 {
-                    listBoxErrorItems.Add("No input name Class IDs Available for this URL ");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No input name Class IDs Available for this URL ");
                  
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -338,7 +329,7 @@ namespace Auto_Web_Login
                     }
                 else
                 {
-                    listBoxErrorItems.Add("No input Class IDs Available for this URL ");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No input Class IDs Available for this URL ");
                  
                     // MessageBox.Show("No Input Name IDs Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -355,7 +346,7 @@ namespace Auto_Web_Login
                     }
                 else
                 {
-                    listBoxErrorItems.Add("No Web Links Available for this URL ");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Web Links Available for this URL ");
                  
                     // MessageBox.Show("No Links Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -371,7 +362,7 @@ namespace Auto_Web_Login
                     }
                 else
                 {
-                    listBoxErrorItems.Add("No Image sources Available for this URL ");
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "No Image sources Available for this URL ");
               
                     //  MessageBox.Show("No Links Available for this URL , Trying to find button as an input value instead !!", "What have you done!! ha", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -382,8 +373,8 @@ namespace Auto_Web_Login
             }
             catch (Exception ex)
             {
-                listBoxErrorItems.Add("Cannot scrape this site Bad Request, Original ERROR: " + ex.Message);
-                listBoxErrorItems.Add("TRY RELOADING");
+                listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "Cannot scrape this site Bad Request, Original ERROR: " + ex.Message);
+                listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + "TRY RELOADING");
              
                 MessageBox.Show("Cannot scrape this site Bad Request , TRY RELOADING it !!! , Original ERROR : " + ex.Message , "Something has gone wrong !! so fix it yourself lol", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -421,7 +412,8 @@ namespace Auto_Web_Login
                     dataGridView1.DataSource = table5;
                 }
 
-                listBoxErrors.Items.AddRange(listBoxErrorItems.ToArray());
+                toolStripStatusLabelErrorCount.Text = "List of Errors Counter : " + listBoxErrorItemsList.Count.ToString();
+                listBoxErrors.Items.AddRange(listBoxErrorItemsList.ToArray());
             });
         }
     
@@ -461,6 +453,12 @@ namespace Auto_Web_Login
 
         private void btnStartSendFromFile_Click(object sender, EventArgs e)
         {
+            if(currentUrl == "")
+            {
+                MessageBox.Show("You must use the ( Set URL Reference ) button before auto sending the logins !!!", "Hey Noob , What ya doing ?", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             //start the timer that will send the password at the interval set
             timerCurrentUrl.Interval = (int)frequencySeconds.Value * 1000;
             timerCurrentUrl.Start();
@@ -477,10 +475,10 @@ namespace Auto_Web_Login
         }
         private void timerCurrentUrl_Tick(object sender, EventArgs e)
         {
-            
+            //if the url has changed it is more than lickely you have logged in or got redirected so stop sending
             if(currentUrl != urlChanged)
             {
-
+                //stop sending the passwords
                 keepSending = false;
 
                 listBoxFoundPass.Items.Add("Username : " + txtBUsername.Text);
@@ -491,6 +489,13 @@ namespace Auto_Web_Login
                 btnSendFilePath.Enabled = true;
                 btnStartSendFromFile.Enabled = true;
 
+                //stop the change of the proxy
+                proxyDictionary.Clear();
+                currProxyValue = 0;
+                checkBoxProxyAuto.Checked = false;
+                timerChangeProxy.Stop();
+                timerChangeProxy.Enabled = false;
+
                 try
                 {
 
@@ -498,7 +503,8 @@ namespace Auto_Web_Login
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message , "Auto Sending Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                   // MessageBox.Show(ex.Message , "Auto Sending Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + ex.Message + "  == Auto Sending Failed");
                     // throw;
                 }
             }
@@ -522,7 +528,9 @@ namespace Auto_Web_Login
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Stopping Thread Failed" ,MessageBoxButtons.OK,MessageBoxIcon.Error);
+               // MessageBox.Show(ex.Message, "Stopping Thread Failed" ,MessageBoxButtons.OK,MessageBoxIcon.Error);
+
+                listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + ex.Message + "  == Stopping Thread Failed");
             }
         }
        
@@ -553,7 +561,7 @@ namespace Auto_Web_Login
             }
             catch (Exception )
             {
-                listBoxErrors.Items.Add("ERROR Could Not Send command to web page !!");
+                listBoxErrors.Items.Add(DateTime.Now.ToLongTimeString() + "     " + "ERROR Could Not Send command to web page !!");
                // MessageBox.Show(ex.Message, "m3");
                 //throw;
             }
@@ -664,7 +672,7 @@ namespace Auto_Web_Login
 
                 NavigateToURL();
 
-                currentUrl = txtBURL.Text;
+                currentUrl = "";
 
             }
             else
@@ -673,14 +681,160 @@ namespace Auto_Web_Login
             }
         }
 
+        private void checkBoxProxyAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBoxProxyAuto.Checked)
+            {
+                if (dataGridViewProxy.Rows.Count > 1)
+                {
+
+                  //add the proxylist and ports to a dictionary and the timer will work from that
+                        for (int i = 0; i < dataGridViewProxy.RowCount -1; i++)
+                        {
+                            string ip = dataGridViewProxy.Rows[i].Cells["ProxyIP"].Value.ToString();
+                            string port = ":" + dataGridViewProxy.Rows[i].Cells["ProxyPort"].Value.ToString();
+
+                        if (string.IsNullOrEmpty( ip) || string.IsNullOrEmpty(port))
+                        {
+                            return;
+                        
+                        }
+
+                        if (!proxyDictionary.ContainsKey(i))
+                            {
+                                proxyDictionary.Add(i, ip + port);
+                            }
+
+                           
+                        }
+                  
+                    timerChangeProxy.Enabled = true;
+                    int mins = 1000 * 60 * Convert.ToInt32( ChangeTimeProxyMins.Value.ToString());  //; TimeSpan.FromMinutes(Convert.ToDouble(ChangeTimeProxyMins.Value.ToString())).Seconds;
+                    timerChangeProxy.Interval = mins;
+                    timerChangeProxy.Start();
+
+                
+                }
+                else
+                {
+                    proxyDictionary.Clear();
+                    currProxyValue = 0;
+                  
+                    MessageBox.Show("No Proxy List Data is Entered in Section PROXY LIST", "Hey NOOB!!  What are you doing ?", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    checkBoxProxyAuto.Checked = false;
+                    timerChangeProxy.Stop();
+                   timerChangeProxy.Enabled = false;
+                }
+            }
+            else
+            {
+                proxyDictionary.Clear();
+                currProxyValue = 0;
+                timerChangeProxy.Stop();
+                timerChangeProxy.Enabled = false;
+            }
+        }
+
+       
+        //change the current proxy value to the next value else just start again
+        private void timerChangeProxy_Tick(object sender, EventArgs e)
+        {
+          
+
+            Invoke((MethodInvoker)delegate
+            {
+
+                int dicCount = proxyDictionary.Keys.Count;
+
+                if (dicCount > 0)
+                {
+                    for (int i = 0; i < dicCount; i++)
+                    {
+                        if (currProxyValue == i)
+                        {
+                            txtBProxy.Text = proxyDictionary[i].ToString();
+                           
+
+                            btnGoWithProxy.PerformClick();
+                        }
+
+                    }
+
+                    currProxyValue++;
+
+                    if (currProxyValue == dicCount)
+                    {
+                        currProxyValue = 0;
+                    }
+
+
+                }
+
+            });
+         
+        }
+       private string documentWebBrow ;
+
+        private void backgroundWorkerHtml_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                dataGridViewInputIds.DataSource = null;
+                dataGridViewButtonIds.DataSource = null;
+                dataGridViewOtherHtml.DataSource = null;
+                dataGridViewWebLinks.DataSource = null;
+                dataGridView1.DataSource = null;
+
+                listBoxErrorItemsList.Clear();
+                tableItems1.Clear();
+                tableItems2.Clear();
+                tableItems3.Clear();
+                tableItems4.Clear();
+                tableItems5.Clear();
+
+                listBoxErrors.Items.Clear();
+            });
+
+            Invoke((MethodInvoker)delegate
+            {
+
+
+                FillTable();
+            });
+
+        }
+
+        private void webBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        {
+            progressbarComplete = 0;
+            // toolStripProgressBar1.Value = 0;
+            toolStripStatusLabel1.Text = "Started";
+        }
+
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            btnNavigate.Enabled = true;
-            txtBURL.Enabled = true;
-            toolStripStatusLabel1.Text = "Complete";
-            txtBURL.Text = webBrowser1.Url.AbsoluteUri; //update the txt url with the new url path if redirected
-            urlChanged = webBrowser1.Url.AbsoluteUri;  //update the url changed so that it can compare to the reference url before it was running
-            toolStripProgressBar1.ProgressBar.Value = 100;
+            Invoke((MethodInvoker)delegate
+            {
+                btnNavigate.Enabled = true;
+                txtBURL.Enabled = true;
+                toolStripStatusLabel1.Text = "Complete";
+                txtBURL.Text = webBrowser1.Url.AbsoluteUri; //update the txt url with the new url path if redirected
+                urlChanged = webBrowser1.Url.AbsoluteUri;  //update the url changed so that it can compare to the reference url before it was running
+                toolStripProgressBar1.ProgressBar.Value = 100;
+            });
+          
+
+            documentWebBrow = "";
+            System.Windows.Forms.HtmlDocument document = null;
+            document = webBrowser1.Document;
+            documentWebBrow = document.Body.OuterHtml ;
+
+            if(backgroundWorkerHtml.IsBusy == false)
+            {
+                backgroundWorkerHtml.RunWorkerAsync();
+            }
+
+           
 
         }
         //this is to update the browser search and task complete method its not perfect but it works ok
@@ -688,6 +842,8 @@ namespace Auto_Web_Login
         {
             if (e.CurrentProgress > 0 && e.MaximumProgress > 0)
             {
+
+
                 progressbarComplete = (int)(e.CurrentProgress * 100 / e.MaximumProgress);
 
                 if (progressbarComplete < 99)
@@ -766,8 +922,8 @@ namespace Auto_Web_Login
                 }
                 catch (Exception ex)
                 {
-
-                    MessageBox.Show(ex.Message);
+                listBoxErrorItemsList.Add(DateTime.Now.ToLongTimeString() + "     " + ex.Message + "  == Send Thread ERROR");
+               // MessageBox.Show(ex.Message);
                 }
                 Thread.Sleep(100);
             }
